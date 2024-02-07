@@ -5,6 +5,7 @@ import Project from "./pages/Project";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Header from "./components/Header";
+import FooterCustom from "./pages/FooterCustom";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="sign-in" element={<SignIn />} />
         <Route path="sign-up" element={<SignUp />} />
       </Routes>
+      <FooterCustom />
     </BrowserRouter>
   );
 }
