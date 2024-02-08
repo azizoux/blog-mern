@@ -1,11 +1,21 @@
 import { Alert, Button, Label, Spinner, TextInput } from "flowbite-react";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const {
+    currentUser,
+    loading,
+    error: errorMessage,
+  } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
@@ -13,11 +23,10 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email || !formData.password) {
-      return setErrorMessage("Please fill out all fields!");
+      return dispatch(signInFailure("Fill out all fields!"));
     }
     try {
-      setLoading(true);
-      setErrorMessage(null);
+      dispatch(signInStart());
       const response = await fetch("/api/auth/signin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -26,19 +35,18 @@ function SignIn() {
       const data = await response.json();
       //console.log("data.success:", data);
       if (data.success === false) {
-        setLoading(false);
-        return setErrorMessage(data.message);
+        dispatch(signInFailure(data.message));
       }
-      setLoading(false);
+      //setLoading(false);
       if (response.ok) {
+        dispatch(signInSuccess(data));
         navigate("/");
       }
     } catch (error) {
-      setErrorMessage(error.message);
-      setLoading(false);
+      dispatch(signInFailure(error.message));
     }
   };
-  // console.log(formData);
+  console.log(currentUser);
   return (
     <div className="min-h-screen mt-20">
       <div className="flex max-w-3xl mx-auto p-3 flex-col md:flex-row md:items-center gap-5">
